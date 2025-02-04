@@ -19,37 +19,16 @@ resource "aws_iam_policy" "codebuild_policy" {
   name        = "${var.codebuild_name}-Policy"
   description = "Policy for AWS CodeBuild to run Terraform"
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "iam:PassRole",
-          "iam:CreateRole",
-          "iam:AttachRolePolicy"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "lambda:CreateFunction",
-          "lambda:UpdateFunctionCode",
-          "lambda:UpdateFunctionConfiguration"
-        ],
-        Resource = "*"
-      }
-    ]
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : "*",
+          "Resource" : "*"
+        }
+      ]
   })
 }
 
@@ -71,7 +50,7 @@ resource "aws_codebuild_project" "terraform_build" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec       = "pipeline/buildspec.yml"
+    buildspec = "pipeline/buildspec.yml"
   }
 
   environment {
@@ -98,10 +77,10 @@ resource "aws_codebuild_project" "terraform_build" {
 
   logs_config {
     cloudwatch_logs {
-      status = "DISABLED"  # ✅ Disable CloudWatch logging
+      status = "DISABLED" # ✅ Disable CloudWatch logging
     }
   }
-  
+
 }
 
 # ### Pipeline
@@ -176,7 +155,7 @@ resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
 
 resource "aws_codepipeline" "terraform_pipeline" {
   name     = "${var.codebuild_name}-pipeline"
-  role_arn = aws_iam_role.codepipeline_role.arn 
+  role_arn = aws_iam_role.codepipeline_role.arn
 
   artifact_store {
     location = var.s3_tf_id

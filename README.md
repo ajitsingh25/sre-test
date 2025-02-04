@@ -39,6 +39,8 @@ terraform init
 terraform plan -out=out.plan
 terraform apply "out.plan"
 ```
+### RUn Terraform Pipeline from AWS Console or CLI
+
 ### **OR** 
 ##### Create AWS Infrastructure Manually
 ##### Initialize Terraform
@@ -91,15 +93,8 @@ curl -X GET "https://${api_endpoint}/prod/tasks"
 ---
 ## *Observability Dashboards*
 ### Use these links to monitor logs & errors:
+- Frontend [Front Page](https://d2em6al9r5u3g1.cloudfront.net/index.html)
+- CloudWatch Dashboard (API & Lambda Logs) [CloudWatch Dashboard](https://eu-central-1.console.aws.amazon.com/cloudwatch/home#dashboards:name=SRE-API-Metrics)
+- Splunk Dashboard (Aggregated AWS Logs) [Splunk Dashboard](https://prd-p-gcxgi.splunkcloud.com/en-GB/app/search/search?earliest=-24h%40h&latest=now&q=search%20index%3D*&display.page.search.mode=smart&dispatch.sample_ratio=1&workload_pool=&sid=1738687772.9026)
+- Sentry Dashboard (Error Monitoring) [Sentry Issues](https://comet-rocks-uc.sentry.io/issues/?project=4508747779145808&query=&referrer=issue-list&statsPeriod=14d)
 
-- CloudWatch Dashboard (API & Lambda Logs) [CloudWatch Dashboard]()
-- Splunk Dashboard (Aggregated AWS Logs) [Splunk Dashboard]()
-- Sentry Dashboard (Error Monitoring) [Sentry Issues]()
-
----
-
-## *Resources*
-- AWS Lambda Documentation: [AWS Lambda]()
-- Terraform AWS Provider: [Terraform AWS]()
-- Splunk Docs: [Splunk for AWS]()
-- Sentry Docs: [Sentry for AWS Lambda]()
