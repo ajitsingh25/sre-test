@@ -8,6 +8,7 @@ import sentry_sdk
 from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
 import boto3
 from botocore.exceptions import ClientError
+from datetime import datetime
 import time
 
 # ✅ Initialize Sentry
@@ -149,8 +150,8 @@ def lambda_handler(event, context):
     logger.info("🔍 Lambda function started. Checking required environment variables.")
 
     conn = None
-    cur = None  # ✅ Ensure cur is always initialized
-    task_list = []  # ✅ Initialize list properly
+    cur = None
+    task_list = []
 
     try:
         # ✅ Ensure environment variables are set
@@ -171,12 +172,13 @@ def lambda_handler(event, context):
             cur.execute("SELECT id, description, created_at FROM tasks ORDER BY created_at DESC")
             tasks = cur.fetchall()
 
-        # ✅ Process query results into a structured list
+        # ✅ Convert `created_at` safely
         for task in tasks:
+            created_at = task[2] if isinstance(task[2], str) else task[2].isoformat()
             task_dict = {
-                "id": task[0],  # ✅ Access tuple elements correctly
+                "id": task[0],
                 "description": task[1],
-                "created_at": task[2].isoformat() if task[2] else None  # Convert to ISO format
+                "created_at": created_at
             }
             task_list.append(task_dict)
 
@@ -197,7 +199,7 @@ def lambda_handler(event, context):
         if cur:
             cur.close()
         if conn:
-            return_db_connection(conn)  # ✅ Ensure connection is returned
+            return_db_connection(conn)
 
 def generate_response(status_code, body):
     """Generates API Gateway response with CORS."""

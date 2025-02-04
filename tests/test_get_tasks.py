@@ -5,6 +5,7 @@ import pytest
 import boto3
 from moto import mock_aws
 from unittest.mock import patch, MagicMock
+from datetime import datetime
 
 # ✅ Set environment variables BEFORE importing `get_tasks.py`
 os.environ["DB_SECRET_NAME"] = "mock-db-secret"
@@ -48,8 +49,9 @@ def test_get_db_credentials():
     secret_value = json.dumps({"username": "test_user", "password": "test_pass"})
     client.create_secret(Name=secret_name, SecretString=secret_value)
 
-    # ✅ Call function
-    username, password = get_db_credentials()
+    # ✅ Patch environment variable
+    with patch.dict(os.environ, {"DB_SECRET_NAME": secret_name, "AWS_REGION": "us-east-1"}):
+        username, password = get_db_credentials()
 
     # ✅ Assert values are correctly retrieved
     assert username == "test_user"
@@ -84,22 +86,19 @@ def test_initialize_db_pool(mock_get_db_credentials, mock_conn_pool):
 
 
 # ✅ Test Lambda Handler with a Mocked Database Response
-@patch("get_tasks.get_db_connection")
-@patch("get_tasks.return_db_connection")
+@patch("lambda_functions.get_tasks.get_db_connection")
+@patch("lambda_functions.get_tasks.return_db_connection")
 @patch("sentry_sdk.init")  # ✅ Mock Sentry to avoid log issues
-def test_lambda_handler(mock_sentry):
+def test_lambda_handler(mock_sentry, mock_return_db, mock_get_db):
     """Test Lambda handler logic with Sentry mocked."""
 
-    response = lambda_handler({}, {})
-    assert response["statusCode"] in [200, 400] 
-
-    # ✅ Create a fake database response
+    # ✅ Create a fake database response with `datetime` objects
     mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [
-        (1, "Test Task 1", "2025-02-04T12:00:00"),
-        (2, "Test Task 2", "2025-02-04T12:30:00")
+        (1, "Test Task 1", datetime(2025, 2, 4, 12, 0, 0)),  # ✅ Use datetime object
+        (2, "Test Task 2", datetime(2025, 2, 4, 12, 30, 0))  # ✅ Use datetime object
     ]
-    
+
     mock_conn = MagicMock()
     mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
     mock_get_db.return_value = mock_conn
@@ -115,8 +114,7 @@ def test_lambda_handler(mock_sentry):
 
     assert response["statusCode"] == 200
     assert response["body"] == expected_body
-
-# ✅ Test Lambda Handler with Missing Environment Variables
+    
 def test_lambda_handler_missing_env():
     """Test Lambda handler when environment variables are missing."""
 
