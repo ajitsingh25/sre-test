@@ -1,9 +1,23 @@
+import sys
 import json
 import os
 import pytest
 import boto3
 from moto import mock_aws
 from unittest.mock import patch, MagicMock
+
+# ✅ Set environment variables BEFORE importing `get_tasks.py`
+os.environ["DB_SECRET_NAME"] = "mock-db-secret"
+os.environ["AWS_REGION"] = "us-east-1"
+os.environ["DB_HOST"] = "localhost"
+os.environ["DB_NAME"] = "test_db"
+os.environ["LOG_LEVEL"] = "INFO"
+os.environ["SENTRY_DSN"] = ""
+
+# ✅ Ensure Python can find the `lambda_functions` module
+sys.path.append("./lambda_functions")
+
+# ✅ Now import get_tasks.py
 from lambda_functions.get_tasks import get_db_credentials, initialize_db_pool, lambda_handler, generate_response
 
 # ✅ Set Environment Variables for Testing
@@ -26,27 +40,35 @@ def set_env_vars():
 def test_get_db_credentials():
     """Test fetching database credentials from AWS Secrets Manager."""
     
+    # ✅ Create a mock Secrets Manager client
     client = boto3.client("secretsmanager", region_name="us-east-1")
 
+    # ✅ Mock secret value
     secret_name = "mock-db-secret"
     secret_value = json.dumps({"username": "test_user", "password": "test_pass"})
     client.create_secret(Name=secret_name, SecretString=secret_value)
 
+    # ✅ Call function
     username, password = get_db_credentials()
+
+    # ✅ Assert values are correctly retrieved
     assert username == "test_user"
     assert password == "test_pass"
-    
 
 # ✅ Mock Database Connection
-@patch("get_tasks.psycopg2.pool.SimpleConnectionPool")
-@patch("get_tasks.get_db_credentials", return_value=("test_user", "test_pass"))
+@patch("lambda_functions.get_tasks.psycopg2.pool.SimpleConnectionPool")
+@patch("lambda_functions.get_tasks.get_db_credentials", return_value=("test_user", "test_pass"))
 def test_initialize_db_pool(mock_get_db_credentials, mock_conn_pool):
     """Test database connection pool initialization."""
 
+    # ✅ Mock the connection pool
     mock_conn_pool.return_value = MagicMock()
-    
-    # ✅ Call the function
+
+    # ✅ Call the function (now it uses the mocked `get_db_credentials`)
     initialize_db_pool()
+
+    # ✅ Ensure get_db_credentials was called once
+    mock_get_db_credentials.assert_called_once()
 
     # ✅ Assert that the connection pool was initialized
     mock_conn_pool.assert_called_once_with(
@@ -59,6 +81,7 @@ def test_initialize_db_pool(mock_get_db_credentials, mock_conn_pool):
         connect_timeout=10,
         sslmode="require"
     )
+
 
 # ✅ Test Lambda Handler with a Mocked Database Response
 @patch("get_tasks.get_db_connection")
