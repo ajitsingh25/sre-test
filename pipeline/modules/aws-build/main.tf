@@ -66,13 +66,12 @@ resource "aws_codebuild_project" "terraform_build" {
   service_role  = aws_iam_role.codebuild_role.arn
 
   artifacts {
-    type = "NO_ARTIFACTS"
+    type = "CODEPIPELINE"
   }
 
   source {
-    type            = "GITHUB"
-    location        = var.git_repo
-    git_clone_depth = 1
+    type      = "CODEPIPELINE"
+    buildspec       = "buildspec.yml"
   }
 
   environment {
@@ -85,7 +84,18 @@ resource "aws_codebuild_project" "terraform_build" {
       name  = "TF_BUCKET"
       value = var.s3_tf_id
     }
+
+    environment_variable {
+      name  = "GIT_USER"
+      value = var.git_user
+    }
+
+    environment_variable {
+      name  = "GIT_REPO"
+      value = var.git_repo
+    }
   }
+  
 }
 
 # ### Pipeline
@@ -97,9 +107,70 @@ data "aws_secretsmanager_secret_version" "git_secret_value" {
   secret_id = data.aws_secretsmanager_secret.git_secret.id
 }
 
+####
+resource "aws_iam_role" "codepipeline_role" {
+  name = "${var.codebuild_name}-pipeline-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "codepipeline.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "codepipeline_policy" {
+  name        = "${var.codebuild_name}-pipeline-policy"
+  description = "IAM policy for CodePipeline to deploy Terraform"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        Resource = "arn:aws:s3:::${var.s3_tf_id}/*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "codebuild:StartBuild",
+          "codebuild:StopBuild",
+          "codebuild:BatchGetBuilds"
+        ],
+        Resource = aws_codebuild_project.terraform_build.arn
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "iam:PassRole"
+        ],
+        Resource = aws_iam_role.codebuild_role.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_policy.arn
+}
+
+######
+
 resource "aws_codepipeline" "terraform_pipeline" {
   name     = "${var.codebuild_name}-pipeline"
-  role_arn = aws_iam_role.codebuild_role.arn
+  role_arn = aws_iam_role.codepipeline_role.arn 
 
   artifact_store {
     location = var.s3_tf_id

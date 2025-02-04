@@ -1,3 +1,9 @@
+module "s3-backend" {
+  source           = "../infrastructure/modules/s3"
+  bucket_name      = "terraform-state"
+  enable_s3_config = false
+}
+
 module "codebuild" {
   source         = "./modules/aws-build"
   codebuild_name = "sre"

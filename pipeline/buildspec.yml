@@ -1,0 +1,40 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9  # ✅ Ensure Python 3.9 is installed
+    commands:
+      - echo "Installing Terraform..."
+      - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.3.0/terraform_1.3.0_linux_amd64.zip
+      - unzip terraform.zip
+      - mv terraform /usr/local/bin/
+      - terraform version
+
+  pre_build:
+    commands:
+      - echo "Cloning Terraform repository..."
+      - git clone https://github.com/$GIT_USER/$GIT_REPO.git
+      - cd $GIT_REPO
+      - echo "Setting up Terraform backend..."
+      - aws s3 cp s3://$TF_BUCKET/backend.tf backend.tf || true
+      - terraform init -backend-config="bucket=$TF_BUCKET"
+
+  build:
+    commands:
+      - echo "Running Terraform Plan..."
+      - terraform plan -out=tfplan
+      - echo "Terraform Plan completed."
+
+  post_build:
+    commands:
+      - echo "Uploading Terraform Plan to S3..."
+      - aws s3 cp tfplan s3://$TF_BUCKET/tfplan --sse AES256
+      - echo "Running Terraform Apply..."
+      - terraform apply -auto-approve tfplan
+      - echo "Build and deployment completed successfully."
+
+artifacts:
+  files:
+    - tfplan
+  discard-paths: yes

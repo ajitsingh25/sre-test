@@ -1,8 +1,8 @@
-module "s3-backend" {
-  source           = "./modules/s3"
-  bucket_name      = "ajitsre"
-  enable_s3_config = false
-}
+# module "s3-backend" {
+#   source           = "./modules/s3"
+#   bucket_name      = "ajitsre"
+#   enable_s3_config = false
+# }
 
 # ✅ Retrieve AWS Account ID
 data "aws_caller_identity" "current" {}
