@@ -6,7 +6,7 @@ This project sets up a **serverless task management API** using:
 - **API Gateway** (API Management)
 - **RDS (PostgreSQL) via RDS Proxy** (Database)
 - **S3 + CloudFront** (Frontend Hosting)
-- **Monitoring with Sentry, Splunk & CloudWatch**
+- **Monitoring with Sentry, Splunk (aws kinesis) & CloudWatch dashboard**
 - **CI CD Pipeline with AWS CodePipeline**
 
 ---
