@@ -25,16 +25,16 @@ This project sets up a **serverless task management API** using:
 
 #### Clone the Repository
 ##### Create AWS Pipeline
-##### CLone Repo
+###### CLone Repo
 ``` sh
 git clone https://github.com/ajitsingh25/sre-test/
 cd pipeline
 ```
-##### Initialize Terraform
+###### Initialize Terraform
 ``` sh
 terraform init
 ```
-##### Apply Terraform Configuration
+###### Apply Terraform Configuration
 ``` sh
 terraform plan -out=out.plan
 terraform apply "out.plan"
@@ -46,12 +46,12 @@ aws codepipeline start-pipeline-execution --name <PIPELINE_NAME>
 
 ### **OR** 
 ##### Create AWS Infrastructure Manually
-##### Initialize Terraform
+###### Initialize Terraform
 ``` sh
 cd infrastructure
 terraform init
 ```
-##### Apply Terraform Configuration
+###### Apply Terraform Configuration
 ``` sh
 terraform plan -out=out.plan
 terraform apply "out.plan"
@@ -93,6 +93,25 @@ curl -X GET "https://${api_endpoint}/prod/tasks"
   }
 ]
 ```
+
+#### Test Python Code 
+``` sh
+PYTHONPATH=. pytest tests/test_get_tasks.py  
+pytest
+```
+#### Expected Response:
+``` sh
+pytest 
+===================================================================== test session starts =====================================================================
+platform darwin -- Python 3.11.6, pytest-8.3.4, pluggy-1.5.0
+rootdir: /Users/ajitsingh7/mywork/comet/sre-assignment
+collected 5 items                                 
+
+tests/test_get_tasks.py .....                                  [100%]
+
+====================================================================== 5 passed in 1.91s =====================================================================
+```
+
 ---
 ## *Observability Dashboards*
 ### Use these links to monitor logs & errors:
