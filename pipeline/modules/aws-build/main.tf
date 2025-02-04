@@ -71,7 +71,7 @@ resource "aws_codebuild_project" "terraform_build" {
 
   source {
     type      = "CODEPIPELINE"
-    buildspec       = "sre/pipeline/buildspec.yml"
+    buildspec       = "pipeline/buildspec.yml"
   }
 
   environment {
