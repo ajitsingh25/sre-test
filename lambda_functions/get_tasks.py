@@ -39,11 +39,16 @@ DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DB_SECRET_NAME = os.getenv("DB_SECRET_NAME")  # ✅ Fetch secret name from environment variables
 REGION = os.getenv("AWS_REGION")
-LOG_LEVEL = os.getenv("LOG_LEVEL")
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+VALID_LOG_LEVELS = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+
+if LOG_LEVEL.upper() not in VALID_LOG_LEVELS:
+    LOG_LEVEL = "INFO"  # ✅ Fallback to INFO if invalid log level is found
+
 
 # Configure logging
 logger = logging.getLogger()
-logger.setLevel(LOG_LEVEL)
+logger.setLevel(LOG_LEVEL.upper())
 
 # Connection pool (global) and pool lock
 DB_POOL = None
