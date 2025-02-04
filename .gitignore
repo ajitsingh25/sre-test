@@ -31,7 +31,8 @@ debug.tf
 
 # Ignore Terraform archive files (if using ZIPs for Lambda deployment)
 *.zip
-lambda_functions/*.zip
+lambda_functions/lambda_pkg/*
+lambda_functions/psycopg2_layer/*
 
 # Ignore CI/CD build artifacts
 build/

@@ -119,3 +119,13 @@ module "kinesis" {
   api_gateway_log_group_name      = module.api_gateway.api_gateway_log_group_name
   rdsproxy_log_group_name         = "/aws/rds/proxy/${module.rds.rds_proxy_name}"
 }
+
+module "codebuild" {
+  source = "./modules/aws-build"
+  codebuild_name = "sre"
+  s3_tf_id = module.s3.s3_bucket_id
+  git_repo = "https://github.com/ajitsingh25/sre-test"
+  git_user = "ajitsingh25"
+  github_token = ""
+  git_branch = "main"
+}
