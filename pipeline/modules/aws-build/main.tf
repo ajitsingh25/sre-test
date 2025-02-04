@@ -95,6 +95,12 @@ resource "aws_codebuild_project" "terraform_build" {
       value = var.git_repo
     }
   }
+
+  logs_config {
+    cloudwatch_logs {
+      status = "DISABLED"  # ✅ Disable CloudWatch logging
+    }
+  }
   
 }
 
