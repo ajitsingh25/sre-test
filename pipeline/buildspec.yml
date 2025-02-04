@@ -13,12 +13,10 @@ phases:
 
   pre_build:
     commands:
-      - echo "Cloning Terraform repository..."
-      - git clone https://github.com/$GIT_USER/$GIT_REPO.git
-      - cd $GIT_REPO
+      - cd $CODEBUILD_SRC_DIR/infrastructure 
       - echo "Setting up Terraform backend..."
       - aws s3 cp s3://$TF_BUCKET/backend.tf backend.tf || true
-      - terraform init -backend-config="bucket=$TF_BUCKET"
+      - terraform init
 
   build:
     commands:
@@ -29,9 +27,9 @@ phases:
   post_build:
     commands:
       - echo "Uploading Terraform Plan to S3..."
-      - aws s3 cp tfplan s3://$TF_BUCKET/tfplan --sse AES256
+      - aws s3 cp tfplan s3://terraform-state-gbvcdu43/tfplan
       - echo "Running Terraform Apply..."
-      - terraform apply -auto-approve tfplan
+      - terraform apply "tfplan"
       - echo "Build and deployment completed successfully."
 
 artifacts:

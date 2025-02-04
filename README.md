@@ -23,27 +23,47 @@ This project sets up a **serverless task management API** using:
 ###  **Deploy the Infrastructure**
 
 #### Clone the Repository
+##### Create AWS Pipeline
+##### CLone Repo
 ``` sh
-git clone <repo-url>
-cd <repo-folder>
+git clone https://github.com/ajitsingh25/sre-test/
+cd pipeline
 ```
-### Initialize Terraform
+##### Initialize Terraform
 ``` sh
 terraform init
 ```
-### Apply Terraform Configuration
+##### Apply Terraform Configuration
 ``` sh
-terraform apply
+terraform plan -out=out.plan
+terraform apply "out.plan"
+```
+### **OR** 
+##### Create AWS Infrastructure Manually
+##### Initialize Terraform
+``` sh
+cd infrastructure
+terraform init
+```
+##### Apply Terraform Configuration
+``` sh
+terraform plan -out=out.plan
+terraform apply "out.plan"
 ```
 ---
 
 ## **Testing the API**
 ### Test POST /tasks (Create a Task)
 ##### Run the following cURL command:
+
 ``` sh
-curl -X POST "https://vo8nww9fy3.execute-api.eu-central-1.amazonaws.com/prod/tasks" \
-     -H "Content-Type: application/json" \
-     -d '{"description": "Buy groceries"}'
+api_endpoint = "https://wicxsz9iwc.execute-api.us-west-2.amazonaws.com"
+
+api_endpoint = "wicxsz9iwc.execute-api.us-west-2.amazonaws.com"
+curl -X POST https://${api_endpoint}/prod/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"description": "Test task"}'
+      
 ```
 #### Expected Response:
 ``` json
@@ -55,7 +75,7 @@ curl -X POST "https://vo8nww9fy3.execute-api.eu-central-1.amazonaws.com/prod/tas
 ###  Test GET /tasks (Fetch All Tasks)
 ##### Run the following cURL command:
 ``` sh
-curl -X GET "https://vo8nww9fy3.execute-api.eu-central-1.amazonaws.com/prod/tasks"
+curl -X GET "https://${api_endpoint}/prod/tasks"
 ```
 #### Expected Response:
 ``` json
