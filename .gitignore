@@ -1,0 +1,56 @@
+# Ignore Terraform state files
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+
+# Ignore Terraform crash logs
+crash.log
+*.crash.log
+
+# Ignore Terraform variable files (avoid storing secrets in Git)
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+
+# Ignore Terraform plan files (generated during `terraform plan`)
+terraform.tfplan
+*.tfplan
+
+# Ignore Terraform provider cache
+.terraform/
+.terraform.lock.hcl
+.terraform-version
+
+# Ignore logs and debug files
+logs/
+*.log
+*.tfdebug
+*.tftrace
+debug.tf
+
+# Ignore Terraform archive files (if using ZIPs for Lambda deployment)
+*.zip
+lambda_functions/*.zip
+
+# Ignore CI/CD build artifacts
+build/
+dist/
+cache/
+
+# Ignore VSCode settings (optional)
+.vscode/
+*.code-workspace
+
+# Ignore Python virtual environments (if running Python scripts for automation)
+env/
+.env/
+__pycache__/
+
+# Backup Files
+*.bkp
+
+# Ignore Python virtual environments (if running Python scripts for automation)
+venv/
+.env/
+__pycache__/

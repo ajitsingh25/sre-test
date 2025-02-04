@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 8px;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        p {
+            color: red;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+    <script>
+        const API_BASE_URL = "__API_BASE_URL__"; // ✅ Placeholder for API Gateway URL
+
+        async function fetchTasks() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/prod/tasks`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                    mode: "cors"  // ✅ Ensure cross-origin requests are allowed
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch tasks");
+
+                const tasks = await response.json();
+                document.getElementById("taskTableBody").innerHTML = tasks.map(task =>
+                    `<tr>
+                        <td>${task.id}</td>
+                        <td>${task.description}</td>
+                        <td>${task.created_at}</td>
+                    </tr>`
+                ).join("");
+            } catch (error) {
+                console.error("Error fetching tasks:", error);
+                document.getElementById("errorMessage").innerText = "Error loading tasks.";
+            }
+        }
+
+        async function addTask() {
+            const description = document.getElementById("taskInput").value.trim();
+            const errorMessage = document.getElementById("errorMessage");
+
+            if (!description) {
+                errorMessage.innerText = "Task description cannot be empty!";
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/prod/tasks`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    mode: "cors",  // ✅ Ensure cross-origin requests allowed
+                    body: JSON.stringify({ description })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to add task. Please try again.");
+                }
+
+                document.getElementById("taskInput").value = "";
+                errorMessage.innerText = ""; // Clear error message
+                fetchTasks(); // Refresh task list
+            } catch (error) {
+                console.error("Error adding task:", error);
+                errorMessage.innerText = "Failed to add task. Please try again.";
+            }
+        }
+
+        window.onload = fetchTasks;
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <input type="text" id="taskInput" placeholder="Enter task description">
+        <button onclick="addTask()">Add Task</button>
+        <p id="errorMessage"></p>
+
+        <h2>Tasks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                <!-- Tasks will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>
