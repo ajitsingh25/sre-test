@@ -21,7 +21,7 @@ phases:
     commands:
       - echo "Running Terraform Plan..."
       - cd $CODEBUILD_SRC_DIR/infrastructure 
-      - terraform plan -out=${CODEBUILD_SRC_DIR}/tfplan
+      - terraform plan -out=${CODEBUILD_SRC_DIR}/tfplan -input=false -no-color
       - echo "Terraform Plan completed."
 
   post_build:
@@ -29,5 +29,5 @@ phases:
       - echo "Running Terraform Apply..."
       - cd ${CODEBUILD_SRC_DIR}/infrastructure
       - terraform init
-      - terraform apply "${CODEBUILD_SRC_DIR}/tfplan"
+      - terraform apply -no-color -auto-approve "${CODEBUILD_SRC_DIR}/tfplan"
       - echo "Build and deployment completed successfully."
