@@ -39,7 +39,10 @@ terraform init
 terraform plan -out=out.plan
 terraform apply "out.plan"
 ```
-### RUn Terraform Pipeline from AWS Console or CLI
+### Run Terraform Pipeline from AWS Console or CLI
+``` sh
+aws codepipeline start-pipeline-execution --name <PIPELINE_NAME>
+```
 
 ### **OR** 
 ##### Create AWS Infrastructure Manually
