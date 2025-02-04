@@ -89,6 +89,13 @@ resource "aws_codebuild_project" "terraform_build" {
 }
 
 # ### Pipeline
+data "aws_secretsmanager_secret" "git_secret" {
+  name = "git-personal-token"
+}
+
+data "aws_secretsmanager_secret_version" "git_secret_value" {
+  secret_id = data.aws_secretsmanager_secret.git_secret.id
+}
 
 resource "aws_codepipeline" "terraform_pipeline" {
   name     = "${var.codebuild_name}-pipeline"
@@ -114,7 +121,7 @@ resource "aws_codepipeline" "terraform_pipeline" {
         Owner      = var.git_user
         Repo       = var.git_repo
         Branch     = var.git_branch
-        OAuthToken = var.github_token
+        OAuthToken = jsondecode(data.aws_secretsmanager_secret_version.git_secret_value.secret_string)["token"]
       }
     }
   }

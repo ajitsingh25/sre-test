@@ -14,11 +14,6 @@ variable "git_user" {
   type = string
 }
 
-variable "github_token" {
-  description = "GitHub OAuth Token for CodePipeline"
-  type        = string
-}
-
 variable "git_branch" {
   type = string
 }

@@ -31,6 +31,7 @@ debug.tf
 
 # Ignore Terraform archive files (if using ZIPs for Lambda deployment)
 *.zip
+**/*.zip
 lambda_functions/lambda_pkg/*
 lambda_functions/psycopg2_layer/*
 
@@ -55,3 +56,5 @@ __pycache__/
 venv/
 .env/
 __pycache__/
+
+.DS_Store

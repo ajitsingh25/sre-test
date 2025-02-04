@@ -94,23 +94,6 @@ module "cloudwatch" {
   dashboard_name        = "LambdaMonitoringDashboard" # ✅ New: Dashboard Name
 }
 
-# ✅ Splunk Module
-# module "splunk" {
-#   source                          = "./modules/splunk"
-#   aws_region                      = local.aws_region
-#   vpc_id                          = module.network.vpc_id
-#   rds_private_subnet_az1          = module.network.rds_private_subnet_az1
-#   private_subnet_ids              = module.network.rds_private_subnet_ids
-#   public_subnet_ids               = module.network.public_subnet
-#   splunk_hec_token                = "7937d7f0-dd5c-4fd5-9063-84dc2f9ddfea" # ✅ Replace with actual
-#   rds_log_group_name              = "/aws/rds/instance/${local.db_identifier}/postgresql"
-#   post_task_lambda_log_group_name = module.cloudwatch.post_task_lambda_log_group_name
-#   get_task_lambda_log_group_name  = module.cloudwatch.get_task_lambda_log_group_name
-#   api_gateway_log_group_name      = module.api_gateway.api_gateway_log_group_name
-#   bucket_arn                      = module.s3.s3_bucket_arn
-#   splunk_secret_docker            = "splunk-docker2"
-# }
-
 module "kinesis" {
   source                          = "./modules/kinesis"
   rds_log_group_name              = "/aws/rds/instance/${local.db_identifier}/postgresql"
@@ -120,12 +103,11 @@ module "kinesis" {
   rdsproxy_log_group_name         = "/aws/rds/proxy/${module.rds.rds_proxy_name}"
 }
 
-module "codebuild" {
-  source = "./modules/aws-build"
-  codebuild_name = "sre"
-  s3_tf_id = module.s3.s3_bucket_id
-  git_repo = "https://github.com/ajitsingh25/sre-test"
-  git_user = "ajitsingh25"
-  github_token = ""
-  git_branch = "main"
-}
+# module "codebuild" {
+#   source         = "./modules/aws-build"
+#   codebuild_name = "sre"
+#   s3_tf_id       = module.s3.s3_bucket_id
+#   git_repo       = "https://github.com/ajitsingh25/sre-test"
+#   git_user       = "ajitsingh25"
+#   git_branch     = "main"
+# }
