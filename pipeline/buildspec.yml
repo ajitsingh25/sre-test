@@ -21,15 +21,17 @@ phases:
   build:
     commands:
       - echo "Running Terraform Plan..."
-      - terraform plan -out=tfplan
+      - terraform plan -out=tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID}
+      - cp tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID} ${CODEBUILD_SRC_DIR}/
       - echo "Terraform Plan completed."
 
   post_build:
     commands:
-      - echo "Uploading Terraform Plan to S3..."
-      - aws s3 cp tfplan s3://terraform-state-gbvcdu43/tfplan
       - echo "Running Terraform Apply..."
-      - terraform apply "tfplan"
+      - cp ${CODEBUILD_SRC_DIR_TerraformPlanFile}/tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID} ${CODEBUILD_SRC_DIR}/infrastructure/
+      - cd ${CODEBUILD_SRC_DIR}/infrastructure
+      - terraform init
+      - terraform apply tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID}
       - echo "Build and deployment completed successfully."
 
 artifacts:
