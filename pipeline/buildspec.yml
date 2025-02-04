@@ -15,26 +15,20 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/infrastructure 
       - echo "Setting up Terraform backend..."
-      - aws s3 cp s3://$TF_BUCKET/backend.tf backend.tf || true
       - terraform init
 
   build:
     commands:
       - echo "Running Terraform Plan..."
-      - terraform plan -out=tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID}
-      - cp tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID} ${CODEBUILD_SRC_DIR}/
+      - cd $CODEBUILD_SRC_DIR/infrastructure 
+      - terraform plan -out=tfplan_${CODEBUILD_RESOLVED_SOURCE_VERSION}_${PIPELINE_EXECUTION_ID}
+      - cp tfplan_${CODEBUILD_RESOLVED_SOURCE_VERSION}_${PIPELINE_EXECUTION_ID} $CODEBUILD_SRC_DIR/infrastructure
       - echo "Terraform Plan completed."
 
   post_build:
     commands:
       - echo "Running Terraform Apply..."
-      - cp ${CODEBUILD_SRC_DIR_TerraformPlanFile}/tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID} ${CODEBUILD_SRC_DIR}/infrastructure/
       - cd ${CODEBUILD_SRC_DIR}/infrastructure
       - terraform init
-      - terraform apply tfplan_commitid_${CODEBUILD_RESOLVED_SOURCE_VERSION}_pipelineid_${PIPELINE_EXECUTION_ID}
+      - terraform apply "tfplan_${CODEBUILD_RESOLVED_SOURCE_VERSION}_${PIPELINE_EXECUTION_ID}"
       - echo "Build and deployment completed successfully."
-
-artifacts:
-  files:
-    - tfplan
-  discard-paths: yes
