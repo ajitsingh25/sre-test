@@ -86,7 +86,7 @@ module "cloudwatch" {
   api_gateway_id        = module.api_gateway.api_execution_arn
   lambda_execution_role = module.iam.lambda_execution_role_arn
   aws_region            = local.aws_region            # ✅ Add AWS Region for CloudWatch Metrics
-  dashboard_name        = "LambdaMonitoringDashboard" # ✅ New: Dashboard Name
+  dashboard_name        = "SRE-API-Metrics" # ✅ New: Dashboard Name
 }
 
 module "kinesis" {

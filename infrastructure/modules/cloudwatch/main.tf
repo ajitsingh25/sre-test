@@ -59,7 +59,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration_alarm" {
 
 # ✅ CloudWatch Dashboard for API & Lambda Monitoring
 resource "aws_cloudwatch_dashboard" "sre_dashboard" {
-  dashboard_name = "SRE-API-Metrics"
+  dashboard_name = var.dashboard_name
 
   dashboard_body = jsonencode({
     widgets = [
