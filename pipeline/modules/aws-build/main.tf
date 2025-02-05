@@ -156,6 +156,8 @@ resource "aws_iam_role_policy_attachment" "codepipeline_policy_attachment" {
 resource "aws_codepipeline" "terraform_pipeline" {
   name     = "${var.codebuild_name}-pipeline"
   role_arn = aws_iam_role.codepipeline_role.arn
+  execution_mode = "QUEUED"
+  pipeline_type  = "V2"
 
   artifact_store {
     location = var.s3_tf_id
@@ -174,6 +176,7 @@ resource "aws_codepipeline" "terraform_pipeline" {
       output_artifacts = ["SourceOutput"]
 
       configuration = {
+        PollForSourceChanges = false
         Owner      = var.git_user
         Repo       = var.git_repo
         Branch     = var.git_branch

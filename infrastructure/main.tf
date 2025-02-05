@@ -1,8 +1,3 @@
-# module "s3-backend" {
-#   source           = "./modules/s3"
-#   bucket_name      = "ajitsre"
-#   enable_s3_config = false
-# }
 
 # ✅ Retrieve AWS Account ID
 data "aws_caller_identity" "current" {}
@@ -102,12 +97,3 @@ module "kinesis" {
   api_gateway_log_group_name      = module.api_gateway.api_gateway_log_group_name
   rdsproxy_log_group_name         = "/aws/rds/proxy/${module.rds.rds_proxy_name}"
 }
-
-# module "codebuild" {
-#   source         = "./modules/aws-build"
-#   codebuild_name = "sre"
-#   s3_tf_id       = module.s3.s3_bucket_id
-#   git_repo       = "https://github.com/ajitsingh25/sre-test"
-#   git_user       = "ajitsingh25"
-#   git_branch     = "main"
-# }
